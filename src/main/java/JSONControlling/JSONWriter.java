@@ -3,14 +3,10 @@ package JSONControlling;
 import Objects.EventEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class JSONWriter {
 

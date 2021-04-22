@@ -1,13 +1,12 @@
 package JSONControlling;
 
 import org.json.JSONObject;
-
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 
 public class OrderedJSONObjectFactory {
-    private static Logger log = Logger.getLogger(OrderedJSONObjectFactory.class.getName());
+    private static final Logger log = Logger.getLogger(OrderedJSONObjectFactory.class.getName());
     private static boolean setupDone = false;
     private static Field JSONObjectMapField = null;
 

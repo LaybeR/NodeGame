@@ -3,14 +3,11 @@ package Windows;
 import JSONControlling.JSONReader;
 import JSONControlling.JSONWriter;
 import Objects.EventEntry;
-
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -94,6 +91,9 @@ public class WindowWikiView extends JFrame {
 
     private JButton generateBackToMenu() {
         JButton backToMenu = new JButton("Back to Main Menu");
+        backToMenu.addActionListener(e -> {
+
+        });
         return backToMenu;
     }
 
