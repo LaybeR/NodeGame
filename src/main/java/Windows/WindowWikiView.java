@@ -110,7 +110,9 @@ public class WindowWikiView extends JFrame {
 
     private JButton generateGenerateEventButton() {
         JButton generateEventButton = new JButton("Generate New Event");
+        generateEventButton.addActionListener(e -> {
 
+        });
         return generateEventButton;
     }
 
