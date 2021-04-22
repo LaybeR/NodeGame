@@ -10,15 +10,7 @@ import java.util.LinkedList;
 
 public class JSONReader {
 
-    public LinkedList<EventEntry> getListOfEventsFromJSON() {
-        LinkedList<EventEntry> eventEntries = new LinkedList<>();
-
-        fillLinkedListWithEventEntries(getWikiAsJSONObject(), eventEntries);
-
-        return eventEntries;
-    }
-
-    private void fillLinkedListWithEventEntries(JSONObject oWiki, LinkedList<EventEntry> eventEntries) {
+    public void fillLinkedListWithEventEntries(JSONObject oWiki, LinkedList<EventEntry> eventEntries) {
         JSONArray oEvents = oWiki.getJSONArray("Events");
         for (int i = 0; i < oEvents.length(); i++) {
             JSONObject oEvent = oEvents.getJSONObject(i);

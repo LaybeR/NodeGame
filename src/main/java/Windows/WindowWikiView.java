@@ -1,7 +1,6 @@
 package Windows;
 
-import JSONControlling.JSONReader;
-import JSONControlling.JSONWriter;
+import JSONControlling.JSONHandler;
 import Objects.EventEntry;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,12 +19,13 @@ public class WindowWikiView extends JFrame {
     private JTextArea selectedTextArea;
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
     LinkedList<EventEntry> eventEntries = new LinkedList<>();
-    JSONReader jsonReader = new JSONReader();
-    JSONWriter jsonWriter = new JSONWriter();
+    JSONHandler jsonHandler;
     EventEntry eventEntry = new EventEntry();
     EventEntry selectedEventEntry = null;
 
-    public WindowWikiView() throws MalformedURLException {
+    public WindowWikiView(JSONHandler generalHandler) throws MalformedURLException {
+        jsonHandler = generalHandler;
+        jsonHandler.readWikiJSON();
         setWikiTreeUp();
         fillArrayWithEntriesFromJSON();
         setWikiTreeListener();
@@ -43,7 +43,7 @@ public class WindowWikiView extends JFrame {
     }
 
     private void fillArrayWithEntriesFromJSON() {
-        eventEntries = jsonReader.getListOfEventsFromJSON();
+        eventEntries = jsonHandler.getEventEntriesFromWikiJSON();
         eventEntry.sort(eventEntries);
         fillRootWithAllEvents();
     }
@@ -102,7 +102,8 @@ public class WindowWikiView extends JFrame {
         saveChangesToJSON.addActionListener(e -> {
             if (selectedEventEntry != null) {
                 selectedEventEntry.setEntry(selectedTextArea.getText());
-                jsonWriter.saveEventsToWikiJSON(eventEntries);
+                jsonHandler.updateWikiEvents(eventEntries);
+                jsonHandler.writeWikiToJSON();
             }
         });
         return saveChangesToJSON;
@@ -175,10 +176,10 @@ public class WindowWikiView extends JFrame {
         }
     }
 
-    public static void boot() {
+    public static void boot(JSONHandler jsonHandler) {
         SwingUtilities.invokeLater(() -> {
             try {
-                new WindowWikiView();
+                new WindowWikiView(jsonHandler);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

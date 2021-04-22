@@ -10,12 +10,14 @@ import java.util.LinkedList;
 
 public class JSONWriter {
 
-    public void saveEventsToWikiJSON(LinkedList<EventEntry> eventEntries) {
-        JSONObject oWiki = new JSONObject();
+    public JSONArray getJSONArrayOfEventEntries(LinkedList<EventEntry> eventEntries) {
         JSONArray oEvents = new JSONArray();
         for (EventEntry event : eventEntries)
             oEvents.put(getEventEntryAsJSONObject(event));
-        oWiki.put("Events", oEvents);
+        return oEvents;
+    }
+
+    public void writeToWikiJSON(JSONObject oWiki) {
         File wikiJSONFile = new File(String.valueOf(Paths.get("wiki.json")));
         String oWikiAsString = oWiki.toString();
         oWikiAsString = reformatWikiString(oWikiAsString);

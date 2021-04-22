@@ -1,10 +1,15 @@
 import javax.swing.*;
 
+import JSONControlling.JSONHandler;
 import JSONControlling.OrderedJSONObjectFactory;
 import Windows.WindowWikiView;
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import java.util.HashMap;
+
 public class Main {
+
+    public static JSONHandler jsonHandler = new JSONHandler();
 
     public static void main(String[] args) {
         FlatDarkLaf.install();
@@ -16,6 +21,6 @@ public class Main {
 
         OrderedJSONObjectFactory.setupFieldAccessor();
 
-        WindowWikiView.boot();
+        WindowWikiView.boot(jsonHandler);
     }
 }
