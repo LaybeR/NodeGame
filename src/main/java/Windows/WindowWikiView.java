@@ -1,63 +1,53 @@
 package Windows;
 
 import JSONControlling.JSONHandler;
-import Objects.EventEntry;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 
 public class WindowWikiView extends JFrame {
 
-    private JTree wikiTree;
+    private JTree gameTree;
     private JTextArea selectedTextArea;
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-    LinkedList<EventEntry> eventEntries = new LinkedList<>();
     JSONHandler jsonHandler;
-    EventEntry eventEntry = new EventEntry();
-    EventEntry selectedEventEntry = null;
 
     public WindowWikiView(JSONHandler generalHandler) throws MalformedURLException {
         jsonHandler = generalHandler;
-        jsonHandler.readWikiJSON();
-        setWikiTreeUp();
-        fillArrayWithEntriesFromJSON();
-        setWikiTreeListener();
-        setNodeExpandedState(wikiTree,root);
-        setSelectedTextAreaUp();
+        jsonHandler.readGameFilesJSON();
+
+        setUpSelectedTextArea();
         setUpButtons();
+
+        setUpGameTree();
+        setGameTreeListener();
+        setNodeExpandedState(gameTree, root);
+
         updateThisFrame();
+        setMinSizeOfThisFrame();
         setIcon();
     }
 
-    private void setWikiTreeUp() {
-        wikiTree = new JTree(root);
-        wikiTree.setRootVisible(false);
-        add(new JScrollPane(wikiTree));
+    private void setUpGameTree() {
+        gameTree = new JTree(root);
+        gameTree.setRootVisible(false);
+        add(new JScrollPane(gameTree));
     }
 
-    private void fillArrayWithEntriesFromJSON() {
-        eventEntries = jsonHandler.getEventEntriesFromWikiJSON();
-        eventEntry.sort(eventEntries);
-        fillRootWithAllEvents();
-    }
-
-    private void setWikiTreeListener() {
-        wikiTree.getSelectionModel().addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) wikiTree.getLastSelectedPathComponent();
+    private void setGameTreeListener() {
+        gameTree.getSelectionModel().addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) gameTree.getLastSelectedPathComponent();
             if (currentNode == null) return;
             if (currentNode.isLeaf()) {
-                selectedEventEntry = eventEntry.getEventEntryFromTreeData(
-                        currentNode.toString(),
-                        String.valueOf(e.getPath()),
-                        eventEntries);
-                selectedTextArea.setText(selectedEventEntry.getEntry());
             }
         });
     }
@@ -71,7 +61,7 @@ public class WindowWikiView extends JFrame {
         tree.expandPath(path);
     }
 
-    private void setSelectedTextAreaUp() {
+    private void setUpSelectedTextArea() {
         selectedTextArea = new JTextArea(10, 50);
         add(new JScrollPane(selectedTextArea), BorderLayout.SOUTH);
     }
@@ -86,7 +76,7 @@ public class WindowWikiView extends JFrame {
         buttons.add(generateSaveButton());
         buttons.add(generateGenerateEventButton());
 
-        add(buttons,BorderLayout.NORTH);
+        add(buttons, BorderLayout.NORTH);
     }
 
     private JButton generateBackToMenu() {
@@ -100,11 +90,6 @@ public class WindowWikiView extends JFrame {
     private JButton generateSaveButton() {
         JButton saveChangesToJSON = new JButton("Save Changes to JSON File");
         saveChangesToJSON.addActionListener(e -> {
-            if (selectedEventEntry != null) {
-                selectedEventEntry.setEntry(selectedTextArea.getText());
-                jsonHandler.updateWikiEvents(eventEntries);
-                jsonHandler.writeWikiToJSON();
-            }
         });
         return saveChangesToJSON;
     }
@@ -124,56 +109,29 @@ public class WindowWikiView extends JFrame {
         this.setVisible(true);
     }
 
+    private void setMinSizeOfThisFrame() {
+        this.setMinimumSize(this.getSize());
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeIfNecessary();
+            }
+        });
+    }
+
+    private void resizeIfNecessary() {
+        Dimension d = this.getSize();
+        Dimension minD = this.getMinimumSize();
+        if (d.width < minD.width) d.width = minD.width;
+        if (d.height < minD.height) d.height = minD.height;
+        this.setSize(d);
+    }
+
     private void setIcon() {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("icons/globe_icon.png");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("Icons/globe_icon.png");
         Toolkit kit = Toolkit.getDefaultToolkit();
         Image img = kit.createImage(url);
         setIconImage(img);
-    }
-
-    void fillRootWithAllEvents() {
-        int currentYear = -2;
-        int currentMonth = -2;
-        int currentDay = -2;
-
-        DefaultMutableTreeNode currentYearNode = new DefaultMutableTreeNode();
-        DefaultMutableTreeNode currentMonthNode = new DefaultMutableTreeNode();
-        DefaultMutableTreeNode currentDayNode = new DefaultMutableTreeNode();
-
-        for (EventEntry event : eventEntries) {
-            if (currentYear != event.getYear()) {
-                currentYear = event.getYear();
-                currentMonth = -2;
-                currentDay = -2;
-                currentYearNode = new DefaultMutableTreeNode(currentYear);
-                root.add(currentYearNode);
-            }
-
-            if (currentMonth != event.getMonth()) {
-                currentMonth = event.getMonth();
-                currentDay = -2;
-                currentMonthNode = new DefaultMutableTreeNode(event.getMonthAsString());
-                currentYearNode.add(currentMonthNode);
-            }
-
-            if (currentDay != event.getDay()) {
-                currentDay = event.getDay();
-                if (currentDay == -1) {
-                    currentMonthNode.add(new DefaultMutableTreeNode(event.getTitle()));
-                    continue;
-                }
-
-                currentDayNode = new DefaultMutableTreeNode(currentDay + ".");
-                currentMonthNode.add(currentDayNode);
-                currentDayNode.add(new DefaultMutableTreeNode(event.getTitle()));
-                continue;
-            }
-
-            if (currentDay == -1)
-                currentMonthNode.add(new DefaultMutableTreeNode(event.getTitle()));
-            else
-                currentDayNode.add(new DefaultMutableTreeNode(event.getTitle()));
-        }
     }
 
     public static void boot(JSONHandler jsonHandler) {
