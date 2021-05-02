@@ -1,0 +1,6 @@
+{
+  "startFolder" : {
+    "name" : "Main Menu",
+    "items": ["Start Game","Options","End Game"]
+  }
+}
